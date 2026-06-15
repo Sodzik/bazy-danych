@@ -1,0 +1,51 @@
+1.
+CREATE VIEW kraje AS SELECT Name, Continent FROM country;
+SELECT * FROM kraje;
+2.
+ALTER VIEW kraje AS SELECT Name, Continent, Population FROM country;
+SELECT * FROM kraje;
+3.
+SELECT * FROM kraje ORDER BY Population DESC LIMIT 1;
+4.
+SELECT * FROM kraje k1
+WHERE k1.Population = (
+    SELECT MAX(k2.Population)
+    FROM kraje k2
+    WHERE k2.Continent = k1.Continent
+)
+GROUP BY k1.Continent;
+5.
+DROP VIEW kraje;
+6.
+CREATE VIEW kraje1 AS
+    SELECT
+        countries.name  AS kraj,
+        regions.name  AS region,
+        continents.name AS kontynent,
+        countries.area  AS powierzchnia
+    FROM countries
+    JOIN regions ON countries.region_id = regions.region_id
+    JOIN continents ON regions.continent_id = continents.continent_id;
+
+SELECT * FROM kraje1;
+7.
+SELECT region, SUM(powierzchnia) AS region_area
+FROM kraje1
+GROUP BY region
+ORDER BY region_area DESC;
+8.
+SELECT kontynent, SUM(powierzchnia) AS kontynent_area
+FROM kraje1
+GROUP BY kontynent
+ORDER BY kontynent_area DESC;
+9.
+CREATE VIEW p_kraje AS SELECT countries.name AS kraj, ROUND(AVG(country_stats.population)) AS srednia_populacja, languages.language AS jezyk FROM countries
+    JOIN country_languages ON countries.country_id  = country_languages.country_id
+    JOIN languages  ON country_languages.language_id = languages.language_id
+    JOIN country_stats ON countries.country_id  = country_stats.country_id
+    WHERE languages.language = 'Polish' AND country_stats.year BETWEEN 1997 AND 2003
+    GROUP BY countries.country_id, countries.name, languages.language;
+
+SELECT * FROM p_kraje;
+10.
+SELECT * FROM p_kraje ORDER BY `p_kraje`.`srednia_populacja` DESC
